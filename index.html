@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI Party Game - Like Jackbox but with AI-generated prompts and judging! Play with friends and let AI be the chaos coordinator.">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>🎉 AI Party Game - Let's Get This Party Started!</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Floating Party Elements -->
+    <div class="party-bg">
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+    </div>
+
+    <!-- WELCOME SCREEN -->
+    <div id="welcome-screen" class="screen active">
+        <div class="logo-container">
+            <h1 class="logo bounce-in">🎮 AI PARTY 🎉</h1>
+            <p class="tagline slide-up">Where AI meets chaos!</p>
+        </div>
+        
+        <div class="menu-buttons">
+            <button class="btn btn-primary pulse" onclick="showScreen('create-game')">
+                🚀 Create Game
+            </button>
+            <button class="btn btn-secondary" onclick="showScreen('join-game')">
+                🎯 Join Game
+            </button>
+            <button class="btn btn-info" onclick="showScreen('how-to-play')">
+                ❓ How to Play
+            </button>
+        </div>
+        
+        <div class="footer-text">
+            <span class="sparkle">✨</span> Powered by AI Magic <span class="sparkle">✨</span>
+        </div>
+    </div>
+
+    <!-- CREATE GAME SCREEN -->
+    <div id="create-game" class="screen">
+        <button class="back-btn" onclick="showScreen('welcome-screen')">← Back</button>
+        <h2 class="screen-title">🎪 Create Your Party!</h2>
+        
+        <div class="form-group">
+            <label>Your Name</label>
+            <input type="text" id="host-name" placeholder="Party Host Name" maxlength="15" class="input-field">
+        </div>
+        
+        <div class="game-modes">
+            <h3>Choose Your Game Mode:</h3>
+            
+            <div class="mode-card" onclick="selectMode('prompt-battle')">
+                <div class="mode-icon">⚔️</div>
+                <div class="mode-info">
+                    <h4>Prompt Battle</h4>
+                    <p>AI gives prompts, you answer hilariously. AI judges the chaos!</p>
+                </div>
+            </div>
+            
+            <div class="mode-card" onclick="selectMode('story-builder')">
+                <div class="mode-icon">📖</div>
+                <div class="mode-info">
+                    <h4>Story Builder</h4>
+                    <p>Collaborate to create the weirdest story ever told!</p>
+                </div>
+            </div>
+            
+            <div class="mode-card" onclick="selectMode('ai-trivia')">
+                <div class="mode-icon">🧠</div>
+                <div class="mode-info">
+                    <h4>AI Trivia</h4>
+                    <p>AI-generated questions that'll make you question everything!</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="settings-section">
+            <h3>⚙️ Game Settings</h3>
+            <div class="setting-row">
+                <label>Rounds:</label>
+                <div class="number-picker">
+                    <button onclick="adjustRounds(-1)">-</button>
+                    <span id="round-count">5</span>
+                    <button onclick="adjustRounds(1)">+</button>
+                </div>
+            </div>
+            <div class="setting-row">
+                <label>Time per turn:</label>
+                <select id="time-limit" class="select-field">
+                    <option value="30">30 seconds (Speed Demon)</option>
+                    <option value="60" selected>60 seconds (Normal)</option>
+                    <option value="90">90 seconds (Thinking Mode)</option>
+                    <option value="120">120 seconds (Philosopher)</option>
+                </select>
+            </div>
+        </div>
+        
+        <button class="btn btn-primary btn-large" onclick="createGame()">
+            🎉 Start The Party!
+        </button>
+    </div>
+
+    <!-- JOIN GAME SCREEN -->
+    <div id="join-game" class="screen">
+        <button class="back-btn" onclick="showScreen('welcome-screen')">← Back</button>
+        <h2 class="screen-title">🎯 Join the Fun!</h2>
+        
+        <div class="form-group">
+            <label>Your Name</label>
+            <input type="text" id="player-name" placeholder="Your Awesome Name" maxlength="15" class="input-field">
+        </div>
+        
+        <div class="form-group">
+            <label>Room Code</label>
+            <input type="text" id="room-code" placeholder="XXXX" maxlength="4" class="input-field room-code-input" oninput="this.value = this.value.toUpperCase()">
+        </div>
+        
+        <button class="btn btn-primary btn-large" onclick="joinGame()">
+            🚪 Enter Party!
+        </button>
+    </div>
+
+    <!-- HOW TO PLAY SCREEN -->
+    <div id="how-to-play" class="screen">
+        <button class="back-btn" onclick="showScreen('welcome-screen')">← Back</button>
+        <h2 class="screen-title">❓ How to Play</h2>
+        
+        <div class="instructions">
+            <div class="instruction-card">
+                <div class="step-number">1</div>
+                <h4>Create or Join</h4>
+                <p>One player creates a game and gets a room code. Others join with that code!</p>
+            </div>
+            
+            <div class="instruction-card">
+                <div class="step-number">2</div>
+                <h4>Pick Your Mode</h4>
+                <p><strong>Prompt Battle:</strong> Answer funny prompts<br>
+                   <strong>Story Builder:</strong> Create stories together<br>
+                   <strong>AI Trivia:</strong> Answer AI-made questions</p>
+            </div>
+            
+            <div class="instruction-card">
+                <div class="step-number">3</div>
+                <h4>Play & Laugh</h4>
+                <p>Type your answers or use voice! The AI (or friends) will judge you mercilessly. 😈</p>
+            </div>
+            
+            <div class="instruction-card">
+                <div class="step-number">4</div>
+                <h4>Win Glory!</h4>
+                <p>Rack up points, climb the leaderboard, become the PARTY LEGEND! 👑</p>
+            </div>
+        </div>
+        
+        <button class="btn btn-secondary" onclick="showScreen('welcome-screen')">Got it! 👍</button>
+    </div>
+
+    <!-- LOBBY SCREEN -->
+    <div id="lobby-screen" class="screen">
+        <h2 class="screen-title">🎪 Party Lobby</h2>
+        
+        <div class="room-code-display">
+            <span class="label">Room Code:</span>
+            <span id="display-room-code" class="code">----</span>
+            <button class="copy-btn" onclick="copyRoomCode()">📋</button>
+        </div>
+        
+        <div class="game-mode-badge" id="lobby-mode-badge">
+            <span id="lobby-mode-icon">⚔️</span>
+            <span id="lobby-mode-name">Prompt Battle</span>
+        </div>
+        
+        <div class="players-section">
+            <h3>🎭 Players (<span id="player-count">0</span>/8)</h3>
+            <div id="players-list" class="players-grid">
+                <!-- Players will be added here dynamically -->
+            </div>
+        </div>
+        
+        <div id="host-controls" class="host-controls">
+            <button class="btn btn-primary btn-large pulse" onclick="startGame()" id="start-game-btn" disabled>
+                🎮 Start Game!
+            </button>
+            <p class="hint">Need at least 2 players to start</p>
+        </div>
+        
+        <div id="player-waiting" class="waiting-message" style="display: none;">
+            <div class="loading-dots">
+                <span>.</span><span>.</span><span>.</span>
+            </div>
+            <p>Waiting for host to start the game...</p>
+        </div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="screen">
+        <div class="game-header">
+            <div class="round-info">
+                Round <span id="current-round">1</span>/<span id="total-rounds">5</span>
+            </div>
+            <div class="timer-container">
+                <div class="timer" id="timer">60</div>
+                <svg class="timer-ring" viewBox="0 0 100 100">
+                    <circle class="timer-ring-bg" cx="50" cy="50" r="45"/>
+                    <circle class="timer-ring-progress" id="timer-progress" cx="50" cy="50" r="45"/>
+                </svg>
+            </div>
+            <div class="score-display">
+                Score: <span id="current-score">0</span>
+            </div>
+        </div>
+        
+        <!-- Prompt Battle Mode -->
+        <div id="prompt-battle-ui" class="game-mode-ui">
+            <div class="prompt-card">
+                <div class="prompt-label">🎯 The Prompt:</div>
+                <div id="current-prompt" class="prompt-text">Loading awesome prompt...</div>
+            </div>
+            
+            <div class="answer-section">
+                <textarea id="player-answer" class="answer-input" placeholder="Type your hilarious answer..." maxlength="280"></textarea>
+                <div class="answer-tools">
+                    <button class="voice-btn" onclick="toggleVoiceInput()" id="voice-btn">
+                        🎤 Voice
+                    </button>
+                    <span class="char-count"><span id="char-count">0</span>/280</span>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary submit-btn" onclick="submitAnswer()">
+                ✅ Submit Answer
+            </button>
+        </div>
+        
+        <!-- Story Builder Mode -->
+        <div id="story-builder-ui" class="game-mode-ui" style="display: none;">
+            <div class="story-container">
+                <div class="story-label">📖 The Story So Far:</div>
+                <div id="story-text" class="story-display">Once upon a time...</div>
+            </div>
+            
+            <div class="story-prompt">
+                <span class="prompt-label">🎯 Continue with:</span>
+                <span id="story-prompt-text">an unexpected twist!</span>
+            </div>
+            
+            <div class="answer-section">
+                <textarea id="story-input" class="answer-input" placeholder="Add to the story..." maxlength="200"></textarea>
+                <div class="answer-tools">
+                    <button class="voice-btn" onclick="toggleVoiceInput()" id="story-voice-btn">
+                        🎤 Voice
+                    </button>
+                    <span class="char-count"><span id="story-char-count">0</span>/200</span>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary submit-btn" onclick="submitStoryPart()">
+                ✍️ Add to Story
+            </button>
+        </div>
+        
+        <!-- Trivia Mode -->
+        <div id="ai-trivia-ui" class="game-mode-ui" style="display: none;">
+            <div class="trivia-question-card">
+                <div class="category-badge" id="trivia-category">General Knowledge</div>
+                <div id="trivia-question" class="trivia-question">Loading question...</div>
+            </div>
+            
+            <div id="trivia-options" class="trivia-options">
+                <!-- Options will be added dynamically -->
+            </div>
+        </div>
+        
+        <!-- Waiting for others -->
+        <div id="waiting-ui" class="waiting-ui" style="display: none;">
+            <div class="waiting-animation">
+                <div class="waiting-icon">⏳</div>
+            </div>
+            <h3>Answer Submitted!</h3>
+            <p>Waiting for other players...</p>
+            <div id="submitted-players" class="submitted-list">
+                <!-- Shows who has submitted -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JUDGING SCREEN -->
+    <div id="judging-screen" class="screen">
+        <h2 class="screen-title">⚖️ Time to Judge!</h2>
+        
+        <div class="prompt-reminder">
+            <span class="label">The Prompt Was:</span>
+            <div id="judging-prompt" class="prompt-text"></div>
+        </div>
+        
+        <div id="answers-to-judge" class="answers-grid">
+            <!-- Answers will be displayed here -->
+        </div>
+        
+        <div id="ai-judging" class="ai-judge-section" style="display: none;">
+            <div class="ai-avatar">🤖</div>
+            <div class="ai-speech-bubble">
+                <div id="ai-judgment" class="ai-judgment-text">
+                    Analyzing your questionable life choices...
+                </div>
+            </div>
+        </div>
+        
+        <div id="player-voting" class="voting-section" style="display: none;">
+            <h3>Vote for the BEST answer! (Not your own 😉)</h3>
+            <p class="vote-hint">Tap an answer to vote</p>
+        </div>
+    </div>
+
+    <!-- ROUND RESULTS SCREEN -->
+    <div id="round-results" class="screen">
+        <h2 class="screen-title">🏆 Round Results!</h2>
+        
+        <div id="winner-announcement" class="winner-card">
+            <div class="crown">👑</div>
+            <div class="winner-name" id="round-winner">Player Name</div>
+            <div class="winner-answer" id="winning-answer">"Their amazing answer"</div>
+            <div class="points-earned">+<span id="points-earned">100</span> points!</div>
+        </div>
+        
+        <div id="ai-commentary" class="ai-commentary">
+            <div class="ai-avatar">🤖</div>
+            <div class="ai-speech-bubble">
+                <p id="ai-comment">What a delightfully unhinged response!</p>
+            </div>
+        </div>
+        
+        <div class="current-standings">
+            <h3>📊 Current Standings</h3>
+            <div id="standings-list" class="standings">
+                <!-- Standings will be added here -->
+            </div>
+        </div>
+        
+        <button class="btn btn-primary btn-large" onclick="nextRound()" id="next-round-btn">
+            ➡️ Next Round
+        </button>
+    </div>
+
+    <!-- FINAL RESULTS SCREEN -->
+    <div id="final-results" class="screen">
+        <div class="celebration-bg">
+            <div class="firework"></div>
+            <div class="firework"></div>
+            <div class="firework"></div>
+        </div>
+        
+        <h2 class="screen-title rainbow-text">🎉 GAME OVER! 🎉</h2>
+        
+        <div class="podium">
+            <div class="podium-place second">
+                <div class="place-medal">🥈</div>
+                <div class="place-name" id="second-place">---</div>
+                <div class="place-score" id="second-score">0</div>
+                <div class="podium-block">2</div>
+            </div>
+            <div class="podium-place first">
+                <div class="place-medal">🥇</div>
+                <div class="place-crown">👑</div>
+                <div class="place-name" id="first-place">---</div>
+                <div class="place-score" id="first-score">0</div>
+                <div class="podium-block">1</div>
+            </div>
+            <div class="podium-place third">
+                <div class="place-medal">🥉</div>
+                <div class="place-name" id="third-place">---</div>
+                <div class="place-score" id="third-score">0</div>
+                <div class="podium-block">3</div>
+            </div>
+        </div>
+        
+        <div class="final-scores">
+            <h3>📜 Final Scores</h3>
+            <div id="final-scores-list" class="scores-list">
+                <!-- All scores listed here -->
+            </div>
+        </div>
+        
+        <div class="game-stats">
+            <h3>📈 Game Stats</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-value" id="stat-rounds">5</span>
+                    <span class="stat-label">Rounds Played</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="stat-answers">20</span>
+                    <span class="stat-label">Total Answers</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="stat-laughs">∞</span>
+                    <span class="stat-label">Laughs Had</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="end-buttons">
+            <button class="btn btn-primary" onclick="playAgain()">
+                🔄 Play Again
+            </button>
+            <button class="btn btn-secondary" onclick="newGame()">
+                🏠 New Game
+            </button>
+        </div>
+    </div>
+
+    <!-- STORY RESULTS SCREEN (for Story Builder mode) -->
+    <div id="story-results" class="screen">
+        <h2 class="screen-title">📖 The Complete Story!</h2>
+        
+        <div class="final-story-container">
+            <div class="story-book">
+                <div id="complete-story" class="complete-story">
+                    <!-- The full story will appear here -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="story-contributors">
+            <h3>✍️ Written by:</h3>
+            <div id="contributors-list" class="contributors">
+                <!-- Contributors listed here -->
+            </div>
+        </div>
+        
+        <div class="end-buttons">
+            <button class="btn btn-primary" onclick="playAgain()">
+                🔄 Play Again
+            </button>
+            <button class="btn btn-secondary" onclick="newGame()">
+                🏠 New Game
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+    
+    <!-- Sound Toggle Button -->
+    <button id="sound-toggle" class="sound-toggle" onclick="toggleSound()">🔊</button>
+    
+    <!-- Demo Mode Button (for testing) -->
+    <button id="demo-btn" class="demo-btn" onclick="startDemoMode()">🎭 Demo</button>
+
+    <!-- Sound Effects (will be handled by Web Audio API) -->
+    <script src="sounds.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
