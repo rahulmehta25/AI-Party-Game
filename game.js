@@ -4,6 +4,51 @@
    ======================================== */
 
 // ========================================
+// AI BACKEND CONFIGURATION
+// ========================================
+
+const AI_CONFIG = {
+    // Backend server URL - change this if hosting elsewhere
+    serverUrl: 'http://localhost:3001',
+    
+    // Enable/disable real AI (falls back to mock if server unavailable)
+    useRealAI: true,
+    
+    // Timeout for AI requests (ms)
+    timeout: 15000
+};
+
+// Helper function to call AI backend
+async function callAI(endpoint, data) {
+    if (!AI_CONFIG.useRealAI) {
+        return null; // Will use fallback
+    }
+    
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), AI_CONFIG.timeout);
+        
+        const response = await fetch(`${AI_CONFIG.serverUrl}${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+            throw new Error(`AI server error: ${response.status}`);
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.warn('AI backend unavailable, using fallback:', error.message);
+        return null;
+    }
+}
+
+// ========================================
 // GAME STATE
 // ========================================
 
@@ -419,7 +464,7 @@ function startLobbyPolling() {
 // GAME START
 // ========================================
 
-function startGame() {
+async function startGame() {
     if (GameState.players.length < 2) {
         showToast('Need at least 2 players!', 'error');
         return;
@@ -439,7 +484,7 @@ function startGame() {
     if (GameState.currentMode === 'story-builder') {
         GameState.story = [getRandomItem(STORY_STARTERS)];
     } else if (GameState.currentMode === 'ai-trivia') {
-        generateTriviaQuestions();
+        await generateTriviaQuestions();
     }
     
     saveGameState();
@@ -646,8 +691,25 @@ document.getElementById('story-input')?.addEventListener('input', function() {
 // TRIVIA MODE
 // ========================================
 
-function generateTriviaQuestions() {
-    // Generate fun trivia questions
+async function generateTriviaQuestions() {
+    // Show loading state if there's a UI element for it
+    showToast('🤖 AI is generating trivia questions...', 'info');
+    
+    // Try to get real AI-generated trivia
+    const result = await callAI('/api/generate-trivia', {
+        count: GameState.settings.rounds,
+        categories: shuffleArray(TRIVIA_CATEGORIES).slice(0, 4)
+    });
+    
+    if (result && result.questions && result.questions.length > 0) {
+        GameState.triviaQuestions = result.questions;
+        GameState.currentQuestionIndex = 0;
+        console.log('Using AI-generated trivia questions');
+        return;
+    }
+    
+    // Fallback to hardcoded questions if AI fails
+    console.log('Using fallback trivia questions');
     const questions = [
         {
             category: "Space",
@@ -933,24 +995,75 @@ function checkAllVoted() {
     }
 }
 
-function performAIJudging() {
+async function performAIJudging() {
     const answers = Object.values(GameState.answers);
+    const judgmentEl = document.getElementById('ai-judgment');
     
-    // AI "picks" a winner (randomly but with flair)
-    const winner = getRandomItem(answers);
+    // Show thinking state
+    judgmentEl.textContent = "🤔 Analyzing responses...";
+    
+    // Try real AI judging
+    let winnerId = null;
+    let judgment = null;
+    
+    if (GameState.currentMode === 'prompt-battle') {
+        const result = await callAI('/api/judge-prompt-battle', {
+            prompt: GameState.currentPrompt,
+            answers: answers.map(a => ({
+                playerId: a.playerId,
+                playerName: a.playerName,
+                text: a.text
+            }))
+        });
+        
+        if (result) {
+            winnerId = result.winnerId;
+            judgment = result.judgment;
+            
+            // Apply individual scores if provided
+            if (result.scores) {
+                answers.forEach((answer, i) => {
+                    const bonus = Math.floor((result.scores[i] || 50) / 10);
+                    GameState.scores[answer.playerId] = (GameState.scores[answer.playerId] || 0) + bonus;
+                });
+            }
+        }
+    } else if (GameState.currentMode === 'story-builder') {
+        const result = await callAI('/api/judge-story', {
+            currentStory: GameState.story.join(' '),
+            storyPrompt: document.getElementById('story-prompt-text')?.textContent || 'continue the story',
+            contributions: answers.map(a => ({
+                playerId: a.playerId,
+                playerName: a.playerName,
+                text: a.text
+            }))
+        });
+        
+        if (result) {
+            winnerId = result.winnerId;
+            judgment = result.judgment;
+        }
+    }
+    
+    // Fallback to random if AI failed
+    if (!winnerId) {
+        const winner = getRandomItem(answers);
+        winnerId = winner.playerId;
+        judgment = getRandomItem(AI_JUDGMENTS.winner);
+        console.log('Using fallback random judging');
+    }
     
     // Show AI judgment
-    const judgmentEl = document.getElementById('ai-judgment');
-    judgmentEl.textContent = getRandomItem(AI_JUDGMENTS.winner);
+    judgmentEl.textContent = judgment;
     
-    // Award points
-    GameState.scores[winner.playerId] = (GameState.scores[winner.playerId] || 0) + 100;
+    // Award points to winner
+    GameState.scores[winnerId] = (GameState.scores[winnerId] || 0) + 100;
     saveGameState();
     
     SoundFX.play('winner');
     
     setTimeout(() => {
-        showRoundResults(winner.playerId);
+        showRoundResults(winnerId);
     }, 3000);
 }
 
