@@ -463,8 +463,9 @@
     <!-- Demo Mode Button (for testing) -->
     <button id="demo-btn" class="demo-btn" onclick="startDemoMode()">🎭 Demo</button>
 
-    <!-- Sound Effects (will be handled by Web Audio API) -->
+    <!-- Sound Effects (non-module, exposes SoundFX globally) -->
     <script src="sounds.js"></script>
-    <script src="game.js"></script>
+    <!-- Main Game Module -->
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>
