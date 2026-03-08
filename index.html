@@ -38,6 +38,9 @@
             <button class="btn btn-primary pulse" onclick="showScreen('create-game')">
                 🚀 Create Game
             </button>
+            <button class="btn btn-trailer" onclick="showGamePreview()">
+                🎬 Watch Live Preview
+            </button>
             <button class="btn btn-secondary" onclick="showScreen('join-game')">
                 🎯 Join Game
             </button>
@@ -49,6 +52,63 @@
         <div class="footer-text">
             <span class="sparkle">✨</span> Powered by AI Magic <span class="sparkle">✨</span>
         </div>
+    </div>
+
+    <!-- GAME PREVIEW SCREEN -->
+    <div id="game-preview-screen" class="screen">
+        <div class="preview-stage">
+            <button class="back-btn" onclick="exitGamePreview()">← Back</button>
+            <div class="preview-stage-header">
+                <h2 class="screen-title">🎞️ Live Game Preview</h2>
+                <p class="preview-subtitle">A full sample round auto-plays like a launch trailer.</p>
+            </div>
+
+            <div class="preview-timeline" id="preview-timeline">
+                <div class="preview-step active" data-step="prompt">Prompt</div>
+                <div class="preview-step" data-step="responses">Responses</div>
+                <div class="preview-step" data-step="voting">Voting</div>
+                <div class="preview-step" data-step="scoring">Scoring</div>
+            </div>
+
+            <div class="preview-prompt-card" id="preview-prompt-card">
+                <span class="preview-tag">🤖 AI Prompt</span>
+                <p id="preview-prompt-text">Spinning up chaos...</p>
+            </div>
+
+            <div class="preview-players-grid" id="preview-players-grid">
+                <div class="preview-player-card" id="preview-card-p1" data-player="PixelPete">
+                    <span class="preview-avatar">🦊</span>
+                    <span class="preview-name">PixelPete</span>
+                    <p class="preview-answer" id="preview-answer-p1">Waiting for answer...</p>
+                    <div class="preview-vote-pips" id="preview-votes-p1"></div>
+                    <div class="preview-score">Score: <span id="preview-score-p1">240</span></div>
+                </div>
+                <div class="preview-player-card" id="preview-card-p2" data-player="QuipQueen">
+                    <span class="preview-avatar">🦄</span>
+                    <span class="preview-name">QuipQueen</span>
+                    <p class="preview-answer" id="preview-answer-p2">Waiting for answer...</p>
+                    <div class="preview-vote-pips" id="preview-votes-p2"></div>
+                    <div class="preview-score">Score: <span id="preview-score-p2">315</span></div>
+                </div>
+                <div class="preview-player-card" id="preview-card-p3" data-player="RoastRanger">
+                    <span class="preview-avatar">🦝</span>
+                    <span class="preview-name">RoastRanger</span>
+                    <p class="preview-answer" id="preview-answer-p3">Waiting for answer...</p>
+                    <div class="preview-vote-pips" id="preview-votes-p3"></div>
+                    <div class="preview-score">Score: <span id="preview-score-p3">280</span></div>
+                </div>
+            </div>
+
+            <div class="preview-ai-commentary" id="preview-ai-commentary">
+                🤖 AI Judge: "Analyzing comedic damage..."
+            </div>
+
+            <div class="preview-controls">
+                <button class="btn btn-secondary" onclick="replayGamePreview()">↻ Replay Preview</button>
+                <button class="btn btn-primary" onclick="showScreen('create-game')">Start Real Game</button>
+            </div>
+        </div>
+        <div class="preview-confetti-layer" id="preview-confetti-layer"></div>
     </div>
 
     <!-- CREATE GAME SCREEN -->

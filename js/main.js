@@ -44,6 +44,12 @@ import {
 import * as PromptBattle from './modes/prompt-battle.js';
 import * as StoryBuilder from './modes/story-builder.js';
 import * as Trivia from './modes/trivia.js';
+import {
+    showGamePreview as playGamePreview,
+    replayGamePreview as replayTrailerPreview,
+    exitGamePreview as exitTrailerPreview,
+    setSoundFX as setPreviewSoundFX
+} from './game-preview.js';
 
 // ========================================
 // SOUND EFFECTS INTEGRATION
@@ -60,6 +66,7 @@ function initSoundFX() {
         SoundFX = window.SoundFX;
         setUISoundFX(SoundFX);
         setMPSoundFX(SoundFX);
+        setPreviewSoundFX(SoundFX);
         PromptBattle.setSoundFX(SoundFX);
         StoryBuilder.setSoundFX(SoundFX);
         Trivia.setSoundFX(SoundFX);
@@ -379,6 +386,14 @@ window.startDemoMode = function() {
         startLobbyPolling(startGameForPlayer);
     });
 };
+
+// ========================================
+// LIVE PREVIEW TRAILER
+// ========================================
+
+window.showGamePreview = playGamePreview;
+window.replayGamePreview = replayTrailerPreview;
+window.exitGamePreview = exitTrailerPreview;
 
 // ========================================
 // SCREEN NAVIGATION (exposed to window)
